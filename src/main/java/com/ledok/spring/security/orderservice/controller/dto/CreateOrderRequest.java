@@ -1,11 +1,11 @@
 package com.ledok.spring.security.orderservice.controller.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
@@ -15,4 +15,7 @@ public class CreateOrderRequest {
 
     @NotEmpty
     private List<OrderItemRequest> items;
+
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
+    private LocalDateTime deliveryDate;
 }

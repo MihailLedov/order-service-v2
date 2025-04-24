@@ -81,9 +81,10 @@ public class OrderServiceImpl implements OrderService {
 
         productClient.updateProductsStock(stockUpdates);
 
-        // Генерация даты доставки от 2 до 7 дней
-        int daysToAdd = new Random().nextInt(6) + 2;
-        orderEntity.setDeliveryDate(LocalDateTime.now().plusDays(daysToAdd));
+        if (request.getDeliveryDate() != null) {
+            validateDeliveryDate(request.getDeliveryDate());
+        }
+        orderEntity.setDeliveryDate(request.getDeliveryDate());
 
         // Сохраняем заказ
         OrderEntity savedOrder = orderRepository.save(orderEntity);
@@ -161,23 +162,27 @@ public class OrderServiceImpl implements OrderService {
         if (order.getStatus() == OrderStatus.CANCELLED || order.getStatus() == OrderStatus.COMPLETED) {
             throw new InvalidOrderException("Нельзя перенести отмененный или завершенный заказ");
         }
-        LocalDateTime newDate = deliveryDateRequest.getNewOrderDate();
-        LocalTime deliveryTime = newDate.toLocalTime();
-        // Проверка диопазона времени доставки
-        if (deliveryTime.isBefore(LocalTime.of(9, 0)) || deliveryTime.isAfter(LocalTime.of(21, 0))) {
-            throw new TimeIncorrectException("Доставка возможна только с 9:00 до 21:00");
+
+        if (deliveryDateRequest.getNewOrderDate() != null) {
+            validateDeliveryDate(deliveryDateRequest.getNewOrderDate());
         }
-        // Проверка диапозона даты доставки (14 дней со дня заказа)
-        LocalDateTime minDate = LocalDateTime.now().plusDays(1);
-        LocalDateTime maxDate = order.getCreatedAt().plusDays(14);
-        if (newDate.isBefore(minDate)) {
-            throw new TimeIncorrectException("Дата доставки должна быть не раньше " +
-                    minDate.format(DateTimeFormatter.ofPattern("dd.MM.yyyy")));
-        }
-        if (newDate.isAfter(maxDate)) {
-            throw new TimeIncorrectException("Дата доставки должна быть не позже " +
-                    maxDate.format(DateTimeFormatter.ofPattern("dd.MM.yyyy")));
-        }
+//        LocalDateTime newDate = deliveryDateRequest.getNewOrderDate();
+//        LocalTime deliveryTime = newDate.toLocalTime();
+//        // Проверка диопазона времени доставки
+//        if (deliveryTime.isBefore(LocalTime.of(9, 0)) || deliveryTime.isAfter(LocalTime.of(21, 0))) {
+//            throw new TimeIncorrectException("Доставка возможна только с 9:00 до 21:00");
+//        }
+//        // Проверка диапозона даты доставки (14 дней со дня заказа)
+//        LocalDateTime minDate = LocalDateTime.now().plusDays(1);
+//        LocalDateTime maxDate = order.getCreatedAt().plusDays(14);
+//        if (newDate.isBefore(minDate)) {
+//            throw new TimeIncorrectException("Дата доставки должна быть не раньше " +
+//                    minDate.format(DateTimeFormatter.ofPattern("dd.MM.yyyy")));
+//        }
+//        if (newDate.isAfter(maxDate)) {
+//            throw new TimeIncorrectException("Дата доставки должна быть не позже " +
+//                    maxDate.format(DateTimeFormatter.ofPattern("dd.MM.yyyy")));
+//        }
         order.setStatus(OrderStatus.PROCESSING);
         order.setDeliveryDate(deliveryDateRequest.getNewOrderDate());
         order.setUpdatedAt(LocalDateTime.now());
@@ -235,36 +240,35 @@ public class OrderServiceImpl implements OrderService {
 
         return new OrderSummaryDto(startDate, endDate, totalAmount, orders.size());
     }
+    private void validateDeliveryDate(LocalDateTime deliveryDate) {
 
-//    @Override
-//    @Transactional
-//    public OrderSummaryDto getOrderSummary(Long userId, String period) {
-//        LocalDate endDate = LocalDate.now();
-//        LocalDate startDate;
-//
-//        switch (period.toLowerCase()) {
-//            case "день":
-//                startDate = endDate;
-//                break;
-//            case "неделя":
-//                startDate = endDate.minusWeeks(1);
-//                break;
-//            case "месяц":
-//                startDate = endDate.minusMonths(1);
-//                break;
-//            default:
-//                throw new InvalidOrderException("Неверный период. Используйте 'день', 'неделя' или 'месяц'");
-//        }
-//
-//        List<OrderEntity> orders = orderRepository.findByUserIdAndDeliveryDateBetween(
-//                userId,
-//                startDate.atStartOfDay(),
-//                endDate.atTime(23, 59, 59));
-//
-//        BigDecimal totalAmount = orders.stream()
-//                .map(OrderEntity::getTotalAmount)
-//                .reduce(BigDecimal.ZERO, BigDecimal::add);
-//
-//        return new OrderSummaryDto(startDate, endDate, totalAmount, orders.size());
-//    }
+        if (deliveryDate.isBefore(LocalDateTime.now())) {
+            throw new TimeIncorrectException("Дата доставки не может быть в прошлом!");
+        }
+
+        LocalDateTime minDate = LocalDate.now().plusDays(1).atTime(0, 0);
+        LocalDateTime maxDate = LocalDate.now().plusDays(15).atTime(0, 0);
+
+        if (deliveryDate.isBefore(minDate) || deliveryDate.isAfter(maxDate)) {
+            throw new TimeIncorrectException(
+                    "Дата доставки должна быть в диапазоне 14 дней, начиная с 00:00 следующего дня!"
+            );
+        }
+
+        LocalTime deliveryTime = deliveryDate.toLocalTime();
+
+        boolean isFirstWindow = (deliveryTime.isAfter(LocalTime.of(11, 59))
+                && deliveryTime.isBefore(LocalTime.of(15, 1)));
+
+        boolean isSecondWindow = (deliveryTime.isAfter(LocalTime.of(17, 59))
+                && deliveryTime.isBefore(LocalTime.of(21, 1)));
+
+        if (!isFirstWindow && !isSecondWindow) {
+            throw new TimeIncorrectException(
+                    "Доставка осуществляется только в двух временных диапазонах:\n" +
+                            "• с 12:00 до 15:00\n" +
+                            "• с 18:00 до 21:00"
+            );
+        }
+    }
 }
