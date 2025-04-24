@@ -4,9 +4,8 @@ import com.ledok.spring.security.orderservice.controller.dto.CreateOrderRequest;
 import com.ledok.spring.security.orderservice.controller.dto.DeliveryDateRequest;
 import com.ledok.spring.security.orderservice.controller.dto.OrderDto;
 import com.ledok.spring.security.orderservice.controller.dto.OrderSummaryDto;
-import com.ledok.spring.security.orderservice.feign.dto.ProductDto;
+import com.ledok.spring.security.orderservice.gateway.dto.ProductDto;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 public interface OrderService {

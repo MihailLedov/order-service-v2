@@ -1,7 +1,6 @@
 package com.ledok.spring.security.orderservice.controller.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.ledok.spring.security.orderservice.jpa.entity.OrderStatus;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

@@ -1,7 +1,8 @@
-package com.ledok.spring.security.orderservice.feign;
+package com.ledok.spring.security.orderservice.gateway;
 
-import com.ledok.spring.security.orderservice.feign.dto.ProductDto;
-import com.ledok.spring.security.orderservice.feign.dto.ProductStockUpdateDto;
+import com.ledok.spring.security.orderservice.gateway.dto.ProductDto;
+import com.ledok.spring.security.orderservice.gateway.dto.ProductStockReturnDto;
+import com.ledok.spring.security.orderservice.gateway.dto.ProductStockUpdateDto;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -23,4 +24,7 @@ public interface ProductClient {
 
     @PostMapping("/api/products/update-stock")
     void updateProductsStock(@RequestBody List<ProductStockUpdateDto> updates);
+
+    @PostMapping("/api/products/return-stock")
+    void returnProductsStock(@RequestBody List<ProductStockReturnDto> updates);
 }

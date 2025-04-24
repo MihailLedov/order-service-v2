@@ -4,15 +4,13 @@ import com.ledok.spring.security.orderservice.controller.dto.CreateOrderRequest;
 import com.ledok.spring.security.orderservice.controller.dto.DeliveryDateRequest;
 import com.ledok.spring.security.orderservice.controller.dto.OrderDto;
 import com.ledok.spring.security.orderservice.controller.dto.OrderSummaryDto;
-import com.ledok.spring.security.orderservice.feign.dto.ProductDto;
+import com.ledok.spring.security.orderservice.gateway.dto.ProductDto;
 import com.ledok.spring.security.orderservice.service.OrderService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
