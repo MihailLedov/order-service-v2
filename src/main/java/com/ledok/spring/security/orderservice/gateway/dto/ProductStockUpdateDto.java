@@ -1,4 +1,4 @@
-package com.ledok.spring.security.orderservice.feign.dto;
+package com.ledok.spring.security.orderservice.gateway.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

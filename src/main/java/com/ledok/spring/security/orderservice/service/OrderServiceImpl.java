@@ -4,14 +4,15 @@ import com.ledok.spring.security.orderservice.advice.InvalidOrderException;
 import com.ledok.spring.security.orderservice.advice.OrderNotFoundException;
 import com.ledok.spring.security.orderservice.advice.TimeIncorrectException;
 import com.ledok.spring.security.orderservice.controller.dto.*;
-import com.ledok.spring.security.orderservice.feign.ProductClient;
-import com.ledok.spring.security.orderservice.feign.dto.ProductDto;
-import com.ledok.spring.security.orderservice.feign.dto.ProductStockUpdateDto;
-import com.ledok.spring.security.orderservice.jpa.entity.OrderEntity;
-import com.ledok.spring.security.orderservice.jpa.entity.OrderItemEntity;
-import com.ledok.spring.security.orderservice.jpa.entity.OrderStatus;
-import com.ledok.spring.security.orderservice.jpa.repository.OrderItemRepository;
-import com.ledok.spring.security.orderservice.jpa.repository.OrderRepository;
+import com.ledok.spring.security.orderservice.gateway.ProductClient;
+import com.ledok.spring.security.orderservice.gateway.dto.ProductDto;
+import com.ledok.spring.security.orderservice.gateway.dto.ProductStockReturnDto;
+import com.ledok.spring.security.orderservice.gateway.dto.ProductStockUpdateDto;
+import com.ledok.spring.security.orderservice.persistence.entity.OrderEntity;
+import com.ledok.spring.security.orderservice.persistence.entity.OrderItemEntity;
+import com.ledok.spring.security.orderservice.persistence.entity.OrderStatus;
+import com.ledok.spring.security.orderservice.persistence.repository.OrderItemRepository;
+import com.ledok.spring.security.orderservice.persistence.repository.OrderRepository;
 import com.ledok.spring.security.orderservice.mapper.OrderMapper;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -132,6 +133,17 @@ public class OrderServiceImpl implements OrderService {
         if (orderEntity.getStatus() != OrderStatus.CREATED) {
             throw new InvalidOrderException("Отменить можно только заказы в статусе CREATED! ");
         }
+
+        List<ProductStockReturnDto> stockUpdates = new ArrayList<>();
+
+        for (OrderItemEntity item : orderEntity.getItems()) {
+            stockUpdates.add(new ProductStockReturnDto(
+                    item.getProductId(),
+                    item.getQuantity()
+            ));
+        }
+
+        productClient.returnProductsStock(stockUpdates);
 
         orderEntity.setStatus(OrderStatus.CANCELLED);
         orderEntity.setUpdatedAt(LocalDateTime.now());

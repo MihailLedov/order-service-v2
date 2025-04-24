@@ -1,11 +1,10 @@
-package com.ledok.spring.security.orderservice.jpa.entity;
+package com.ledok.spring.security.orderservice.persistence.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 

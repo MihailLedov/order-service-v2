@@ -1,6 +1,6 @@
-package com.ledok.spring.security.orderservice.jpa.repository;
+package com.ledok.spring.security.orderservice.persistence.repository;
 
-import com.ledok.spring.security.orderservice.jpa.entity.OrderEntity;
+import com.ledok.spring.security.orderservice.persistence.entity.OrderEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

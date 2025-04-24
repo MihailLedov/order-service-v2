@@ -2,16 +2,12 @@ package com.ledok.spring.security.orderservice.mapper;
 
 import com.ledok.spring.security.orderservice.controller.dto.OrderDto;
 import com.ledok.spring.security.orderservice.controller.dto.OrderItemDto;
-import com.ledok.spring.security.orderservice.controller.dto.OrderSummaryDto;
-import com.ledok.spring.security.orderservice.jpa.entity.OrderEntity;
-import com.ledok.spring.security.orderservice.jpa.entity.OrderItemEntity;
+import com.ledok.spring.security.orderservice.persistence.entity.OrderEntity;
+import com.ledok.spring.security.orderservice.persistence.entity.OrderItemEntity;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
-import org.mapstruct.factory.Mappers;
 
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
